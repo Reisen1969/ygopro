@@ -11,6 +11,18 @@
 #include "single_mode.h"
 #include <sstream>
 #include <regex>
+#include <stringapiset.h>
+wchar_t* AnsiToUnicode(const char* szStr)
+{
+    int nLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, szStr, -1, NULL, 0 );
+    if (nLen == 0)
+    {
+        return NULL;
+    }
+    wchar_t* pResult = new wchar_t[nLen];
+    MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, szStr, -1, pResult, nLen );
+    return pResult;
+}
 
 unsigned short PRO_VERSION = 0x1353;
 
@@ -1188,7 +1200,7 @@ void Game::LoadExpansions() {
 		const IFileList* archive = DataManager::FileSystem->getFileArchive(i)->getFileList();
 		for(u32 j = 0; j < archive->getFileCount(); ++j) {
 #ifdef _WIN32
-			const wchar_t* fname = archive->getFullFileName(j).c_str();
+			const wchar_t* fname =AnsiToUnicode( archive->getFullFileName(j).c_str());
 #else
 			wchar_t fname[1024];
 			const char* uname = archive->getFullFileName(j).c_str();
